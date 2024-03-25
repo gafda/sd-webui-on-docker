@@ -13,6 +13,7 @@ RUN . /clone.sh BLIP https://github.com/salesforce/BLIP.git 3a29b7410476bf5f2ba0
 RUN . /clone.sh k-diffusion https://github.com/crowsonkb/k-diffusion.git 6ab5146d4a5ef63901326489f31f1d8e7dd36b48
 RUN . /clone.sh clip-interrogator https://github.com/pharmapsychotic/clip-interrogator bc07ce62c179d3aab3053a623d96a071101d11cb
 RUN . /clone.sh generative-models https://github.com/Stability-AI/generative-models fbdc58cab9f4ee2be7a5e1f2e2787ecd9311942f
+RUN . /clone.sh stable-diffusion-webui-assets https://github.com/AUTOMATIC1111/stable-diffusion-webui-assets.git 6f7db241d2f8ba7457bac5ca9753331f0c266917
 
 
 FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
@@ -43,7 +44,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
   pip install -r ${ROOT}/repositories/CodeFormer/requirements.txt
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-  pip install pyngrok xformers==0.0.23.post1 \
+  pip install pyngrok dctorch xformers==0.0.23.post1 \
   git+https://github.com/TencentARC/GFPGAN.git@2eac2033893ca7f427f4035d80fe95b92649ac56 \
   git+https://github.com/openai/CLIP.git@a1d071733d7111c9c014f024669f959182114e33 \
   git+https://github.com/mlfoundations/open_clip.git@3ff1faf10b60be27252be7f6c84ce7c8c5e14ec8
