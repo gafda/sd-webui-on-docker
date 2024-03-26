@@ -1,11 +1,12 @@
 version: '3.9'
 
 x-base_service: &base_service
+    restart: unless-stopped
     ports:
       - "${WEBUI_PORT:-7860}:7860"
     volumes:
-      - &v1 ./data:/data
-      - &v2 ./output:/output
+      - &v1 ./data:/data:rw
+      - &v2 ./output:/output:rw
     stop_signal: SIGKILL
     tty: true
     deploy:
@@ -29,7 +30,7 @@ services:
     <<: *base_service
     profiles: ["auto"]
     build: ./services/AUTOMATIC1111
-    image: sd-auto:72
+    image: sd-auto:1.8.0
     environment:
       - CLI_ARGS=--allow-code --xformers --enable-insecure-extension-access --api
 
