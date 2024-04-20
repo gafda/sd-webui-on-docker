@@ -4,3 +4,8 @@
 # VSCode specific
 *.code-workspace
 /.vscode
+
+/data/**/
+!./data/.gitignore
+/output/**/
+!./output/.gitignore
