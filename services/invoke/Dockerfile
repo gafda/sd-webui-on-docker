@@ -3,7 +3,7 @@ RUN apk add --no-cache aria2
 RUN aria2c -x 5 --dir / --out wheel.whl 'https://github.com/AbdBarho/stable-diffusion-webui-docker/releases/download/6.0.0/xformers-0.0.21.dev544-cp310-cp310-manylinux2014_x86_64-pytorch201.whl'
 
 
-FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+FROM pytorch/pytorch:2.2.2-cuda11.8-cudnn8-runtime
 
 ENV DEBIAN_FRONTEND=noninteractive PIP_EXISTS_ACTION=w PIP_PREFER_BINARY=1
 
@@ -22,11 +22,11 @@ RUN git clone https://github.com/invoke-ai/InvokeAI.git ${ROOT}
 WORKDIR ${ROOT}
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-  git reset --hard f3b2e02921927d9317255b1c3811f47bd40a2bf9 && \
+  git reset --hard ac1071a5e515840077e496cb043841a22b1364f5 && \
   pip install -e .
 
 
-ARG BRANCH=main SHA=f3b2e02921927d9317255b1c3811f47bd40a2bf9
+ARG BRANCH=main SHA=ac1071a5e515840077e496cb043841a22b1364f5
 RUN --mount=type=cache,target=/root/.cache/pip \
   git fetch && \
   git reset --hard && \

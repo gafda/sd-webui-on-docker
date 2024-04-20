@@ -16,7 +16,7 @@ RUN . /clone.sh generative-models https://github.com/Stability-AI/generative-mod
 RUN . /clone.sh stable-diffusion-webui-assets https://github.com/AUTOMATIC1111/stable-diffusion-webui-assets.git 6f7db241d2f8ba7457bac5ca9753331f0c266917
 
 
-FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
 ENV DEBIAN_FRONTEND=noninteractive PIP_PREFER_BINARY=1
 
@@ -32,7 +32,7 @@ WORKDIR /
 RUN --mount=type=cache,target=/root/.cache/pip \
   git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git && \
   cd stable-diffusion-webui && \
-  git reset --hard bef51aed032c0aaa5cfd80445bc4cf0d85b408b5 && \
+  git reset --hard adadb4e3c7382bf3e4f7519126cd6c70f4f8557b && \
   pip install -r requirements_versions.txt
 
 
@@ -44,10 +44,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
   pip install -r ${ROOT}/repositories/CodeFormer/requirements.txt
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-  pip install pyngrok dctorch xformers==0.0.23.post1 \
-  git+https://github.com/TencentARC/GFPGAN.git@2eac2033893ca7f427f4035d80fe95b92649ac56 \
+  pip install pyngrok dctorch xformers==0.0.25.post1 \
+  git+https://github.com/TencentARC/GFPGAN.git@7552a7791caad982045a7bbe5634bbf1cd5c8679 \
   git+https://github.com/openai/CLIP.git@a1d071733d7111c9c014f024669f959182114e33 \
-  git+https://github.com/mlfoundations/open_clip.git@3ff1faf10b60be27252be7f6c84ce7c8c5e14ec8
+  git+https://github.com/mlfoundations/open_clip.git@9eaf2424e74a4e34f5041e640e5e69bac5eb41aa
 
 # there seems to be a memory leak (or maybe just memory not being freed fast enough) that is fixed by this version of malloc
 # maybe move this up to the dependencies list.
