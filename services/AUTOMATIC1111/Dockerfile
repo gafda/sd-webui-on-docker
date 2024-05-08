@@ -2,7 +2,6 @@ FROM alpine/git:2.43.0 as download
 
 COPY clone.sh /clone.sh
 
-
 RUN . /clone.sh stable-diffusion-stability-ai https://github.com/Stability-AI/stablediffusion.git cf1d67a6fd5ea1aa600c4df58e5b47da45f6bdbf \
   && rm -rf assets data/**/*.png data/**/*.jpg data/**/*.gif
 
@@ -10,13 +9,13 @@ RUN . /clone.sh CodeFormer https://github.com/sczhou/CodeFormer.git 8392d0334956
   && rm -rf assets inputs
 
 RUN . /clone.sh BLIP https://github.com/salesforce/BLIP.git 3a29b7410476bf5f2ba0955827390eb6ea1f4f9d
-RUN . /clone.sh k-diffusion https://github.com/crowsonkb/k-diffusion.git 6ab5146d4a5ef63901326489f31f1d8e7dd36b48
+RUN . /clone.sh k-diffusion https://github.com/crowsonkb/k-diffusion.git 21d12c91ad4550e8fcf3308ff9fe7116b3f19a08
 RUN . /clone.sh clip-interrogator https://github.com/pharmapsychotic/clip-interrogator bc07ce62c179d3aab3053a623d96a071101d11cb
 RUN . /clone.sh generative-models https://github.com/Stability-AI/generative-models fbdc58cab9f4ee2be7a5e1f2e2787ecd9311942f
 RUN . /clone.sh stable-diffusion-webui-assets https://github.com/AUTOMATIC1111/stable-diffusion-webui-assets.git 6f7db241d2f8ba7457bac5ca9753331f0c266917
 
 
-FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
 
 ENV DEBIAN_FRONTEND=noninteractive PIP_PREFER_BINARY=1
 
@@ -32,7 +31,7 @@ WORKDIR /
 RUN --mount=type=cache,target=/root/.cache/pip \
   git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git && \
   cd stable-diffusion-webui && \
-  git reset --hard adadb4e3c7382bf3e4f7519126cd6c70f4f8557b && \
+  git reset --hard 1c0a0c4c26f78c32095ebc7f8af82f5c04fca8c0 && \
   pip install -r requirements_versions.txt
 
 
@@ -44,10 +43,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
   pip install -r ${ROOT}/repositories/CodeFormer/requirements.txt
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-  pip install pyngrok dctorch xformers==0.0.25.post1 \
+  pip install pyngrok dctorch xformers==0.0.26.post1 \
   git+https://github.com/TencentARC/GFPGAN.git@7552a7791caad982045a7bbe5634bbf1cd5c8679 \
   git+https://github.com/openai/CLIP.git@a1d071733d7111c9c014f024669f959182114e33 \
-  git+https://github.com/mlfoundations/open_clip.git@9eaf2424e74a4e34f5041e640e5e69bac5eb41aa
+  git+https://github.com/mlfoundations/open_clip.git@2f5a8f4ab0e3d87f6f4b3a8cb585e0f3e947a797
 
 # there seems to be a memory leak (or maybe just memory not being freed fast enough) that is fixed by this version of malloc
 # maybe move this up to the dependencies list.
@@ -58,7 +57,6 @@ COPY . /docker
 
 RUN \
   # mv ${ROOT}/style.css ${ROOT}/user.css && \
-  # one of the ugliest hacks I ever wrote \
   sed -i 's/in_app_dir = .*/in_app_dir = True/g' /opt/conda/lib/python3.10/site-packages/gradio/routes.py && \
   git config --global --add safe.directory '*'
 

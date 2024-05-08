@@ -3,7 +3,7 @@
 > clone this repo and run:
 
 ```shell
-docker compose --profile download up --build
+docker compose --profile download up --build --force-recreate
 # wait until its done, then:
 docker compose --profile [ui] up --build -d
 # where [ui] is one of: invoke | auto | auto-cpu | comfy | comfy-cpu
