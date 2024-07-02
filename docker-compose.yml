@@ -1,5 +1,6 @@
 x-base_service: &base_service
     restart: unless-stopped
+    user: "1000:1000"
     ports:
       - "${WEBUI_PORT:-7860}:7860"
     volumes:
