@@ -1,4 +1,4 @@
-FROM alpine/git:2.43.0 as download
+FROM alpine/git:2.45.2 as download
 
 COPY clone.sh /clone.sh
 
@@ -15,7 +15,7 @@ RUN . /clone.sh generative-models https://github.com/Stability-AI/generative-mod
 RUN . /clone.sh stable-diffusion-webui-assets https://github.com/AUTOMATIC1111/stable-diffusion-webui-assets.git 6f7db241d2f8ba7457bac5ca9753331f0c266917
 
 
-FROM pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
 
 ENV DEBIAN_FRONTEND=noninteractive PIP_PREFER_BINARY=1
 
@@ -31,7 +31,8 @@ WORKDIR /
 RUN --mount=type=cache,target=/root/.cache/pip \
   git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git && \
   cd stable-diffusion-webui && \
-  git reset --hard 1c0a0c4c26f78c32095ebc7f8af82f5c04fca8c0 && \
+  git reset --hard feee37d75f1b168768014e4634dcb156ee649c05 && \
+  python -m pip install pip --upgrade && \
   pip install -r requirements_versions.txt
 
 
@@ -45,8 +46,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN --mount=type=cache,target=/root/.cache/pip \
   pip install pyngrok dctorch xformers==0.0.26.post1 \
   git+https://github.com/TencentARC/GFPGAN.git@7552a7791caad982045a7bbe5634bbf1cd5c8679 \
-  git+https://github.com/openai/CLIP.git@a1d071733d7111c9c014f024669f959182114e33 \
-  git+https://github.com/mlfoundations/open_clip.git@2f5a8f4ab0e3d87f6f4b3a8cb585e0f3e947a797
+  git+https://github.com/openai/CLIP.git@dcba3cb2e2827b402d2701e7e1c7d9fed8a20ef1 \
+  git+https://github.com/mlfoundations/open_clip.git@1be2c8993b3f2628d495dfa791061e92f1cd4d0e
 
 # there seems to be a memory leak (or maybe just memory not being freed fast enough) that is fixed by this version of malloc
 # maybe move this up to the dependencies list.
