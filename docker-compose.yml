@@ -1,18 +1,57 @@
-x-base_service: &base_service
-    ports:
-      - "${WEBUI_PORT:-7860}:7860"
-    volumes:
-      - &v1 ./data:/data
-      - &v2 ./output:/output
-    stop_signal: SIGKILL
-    tty: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-              - driver: nvidia
-                device_ids: ['0']
-                capabilities: [compute, utility]
+# Base configurations
+x-common: &common
+  ports:
+    - "${WEBUI_PORT:-7860}:7860"
+  volumes:
+    - &v1 ./data:/data
+    - &v2 ./output:/output
+  stop_signal: SIGKILL
+  tty: true
+
+# Device configurations
+x-cuda: &cuda
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [compute, utility]
+
+x-rocm: &rocm
+  devices:
+    - /dev/kfd
+    - /dev/dri
+  security_opt:
+    - seccomp=unconfined
+  group_add:
+    - video
+  deploy:
+    # resources:
+      reservations:
+        devices:
+          - driver: amd
+            capabilities: [gpu]
+  environment:
+    - ROCm_VERSION=6.4
+    - HIP_VISIBLE_DEVICES=0
+    - HSA_OVERRIDE_GFX_VERSION=11.0.0
+
+x-cpu: &cpu
+  deploy: {}
+
+# CLI arguments
+x-auto-args: &auto_args
+  CLI_ARGS: --allow-code --medvram --xformers --enable-insecure-extension-access --api
+
+x-auto-cpu-args: &auto_cpu_args
+  CLI_ARGS: --no-half --precision full --allow-code --enable-insecure-extension-access --api
+
+x-comfy-args: &comfy_args
+  CLI_ARGS: ""
+
+x-comfy-cpu-args: &comfy_cpu_args
+  CLI_ARGS: --cpu
 
 name: webui-docker
 
@@ -23,33 +62,46 @@ services:
     volumes:
       - *v1
 
-  auto: &automatic
-    <<: *base_service
-    profiles: ["auto"]
+  # AUTOMATIC1111 services
+  auto-cuda:
+    <<: [*common, *cuda]
+    profiles: ["auto-cuda"]
     build: ./services/AUTOMATIC1111
-    image: sd-auto:78
+    image: sd-auto:79
     environment:
-      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
+      <<: *auto_args
+
+  auto-rocm:
+    <<: [*common, *rocm]
+    profiles: ["auto-rocm"]
+    build:
+      context: ./services/AUTOMATIC1111
+      dockerfile: Dockerfile-rocm
+    image: sd-auto-rocm:79
+    environment:
+      <<: *auto_args
 
   auto-cpu:
-    <<: *automatic
+    <<: [*common, *cpu]
     profiles: ["auto-cpu"]
-    deploy: {}
+    build: ./services/AUTOMATIC1111
+    image: sd-auto-cpu:79
     environment:
-      - CLI_ARGS=--no-half --precision full --allow-code --enable-insecure-extension-access --api
+      <<: *auto_cpu_args
 
-  comfy: &comfy
-    <<: *base_service
-    profiles: ["comfy"]
+  # ComfyUI services
+  comfy-cuda:
+    <<: [*common, *cuda]
+    profiles: ["comfy-cuda"]
     build: ./services/comfy/
     image: sd-comfy:7
     environment:
-      - CLI_ARGS=
-
+      <<: *comfy_args
 
   comfy-cpu:
-    <<: *comfy
+    <<: [*common, *cpu]
     profiles: ["comfy-cpu"]
-    deploy: {}
+    build: ./services/comfy/
+    image: sd-comfy-cpu:7
     environment:
-      - CLI_ARGS=--cpu
+      <<: *comfy_cpu_args

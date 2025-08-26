@@ -1,4 +1,4 @@
-FROM bash:alpine3.19
+FROM bash:alpine3.22
 
 RUN apk update && apk add parallel aria2
 COPY . /docker
